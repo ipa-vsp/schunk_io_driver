@@ -56,7 +56,7 @@ bool PhidgetsContainer::load_component(std::string & package_name, std::string &
 
     ComponentResource component_resource;
     std::string resource_index("rclcpp_components");
-    std::string node_name =  std::string(this->get_name()) + "_" + "phidgets_driver";
+    std::string node_name =  "phidgets_driver_node";
     std::vector<ComponentResource> components = this->get_component_resources(package_name, resource_index);
 
     for (auto it = components.begin(); it != components.end(); ++it)

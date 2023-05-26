@@ -8,13 +8,13 @@
 #include "rclcpp/rclcpp.hpp"
 #include <rclcpp/executor.hpp>
 #include <rclcpp_components/component_manager.hpp>
-#include <phidgets_digital_outputs/digital_outputs_ros_i.hpp>
+#include "phidgets_digital_outputs/digital_outputs_ros_i.hpp"
 
 class PhidgetsContainer : public rclcpp_components::ComponentManager
 {
     public:
         PhidgetsContainer(std::weak_ptr<rclcpp::Executor> executor = std::weak_ptr<rclcpp::executors::MultiThreadedExecutor>(),
-            std::string node_name = "phidgets_container",
+            std::string node_name = "phidgets_container_node",
             const rclcpp::NodeOptions & options = rclcpp::NodeOptions()) : rclcpp_components::ComponentManager(executor, node_name, options)
         {
             executor_ = executor;
