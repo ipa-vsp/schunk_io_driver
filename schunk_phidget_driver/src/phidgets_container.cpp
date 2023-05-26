@@ -46,7 +46,7 @@ bool PhidgetsContainer::load_driver()
         throw PhidgetsContainerException("Failed to load component");
         return false;
     }
-
+    add_node_to_executor(this->digital_outputs_ros_i_->get_node_base_interface());
     return true;
 }
 
@@ -78,7 +78,7 @@ bool PhidgetsContainer::load_component(std::string & package_name, std::string &
             try
             {
                 auto wapper = node_factory->create_node_instance(options);
-                this->add_node_to_executor(wapper.get_node_base_interface());
+                this->digital_outputs_ros_i_ = std::static_pointer_cast<phidgets::DigitalOutputsRosI>(wapper.get_node_instance());
             }
             catch(const std::exception& e)
             {

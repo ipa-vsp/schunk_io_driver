@@ -39,7 +39,7 @@ class PhidgetsContainer : public rclcpp_components::ComponentManager
         std::weak_ptr<rclcpp::Executor> executor_;
         rclcpp::CallbackGroup::SharedPtr cb_group_;
 
-        // std::shared_ptr<phidgets::DigitalOutputsRosI> digital_outputs_ros_i_;
+        std::shared_ptr<phidgets::DigitalOutputsRosI> digital_outputs_ros_i_;
 
         std::string package_;
         std::string driver_;
