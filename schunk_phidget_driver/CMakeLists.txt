@@ -8,7 +8,57 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(phidgets_api REQUIRED)
 find_package(phidgets_drivers REQUIRED)
+find_package(phidgets_msgs REQUIRED)
+find_package(rclcpp_components REQUIRED)
+
+set(dependencies
+  rclcpp
+  std_msgs
+  phidgets_api
+  phidgets_drivers
+  phidgets_msgs
+  rclcpp_components
+)
+
+add_library(phidget_container SHARED src/phidgets_container.cpp)
+target_include_directories(phidget_container PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+ament_target_dependencies(phidget_container ${dependencies})
+
+add_executable(shunk_phidget_driver_node src/schunk_phidget_driver_node.cpp)
+target_include_directories(shunk_phidget_driver_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+target_link_libraries(shunk_phidget_driver_node phidget_container)
+ament_target_dependencies(shunk_phidget_driver_node ${dependencies})
+
+install(
+  DIRECTORY include/
+  DESTINATION include
+)
+# install launch file
+install(DIRECTORY
+  launch 
+  DESTINATION share/${PROJECT_NAME}
+)
+# install libraries
+install(
+  TARGETS phidget_container
+  EXPORT export_${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+# Install executable
+install(TARGETS shunk_phidget_driver_node
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

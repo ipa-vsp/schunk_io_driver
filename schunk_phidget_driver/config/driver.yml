@@ -1,0 +1,3 @@
+drivers:
+  package: "phidgets_digital_outputs"
+  executable: "phidgets_digital_outputs_node"
