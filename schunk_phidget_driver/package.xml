@@ -11,9 +11,11 @@
 
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
+  <depend>control_msgs</depend>
   <depend>phidgets_api</depend>
   <depend>phidgets_drivers</depend>
   <depend>phidgets_msgs</depend>
+  <depend>rclcpp_action</depend>
   <depend>rclcpp_components</depend>
 
   <test_depend>ament_lint_auto</test_depend>

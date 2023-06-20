@@ -9,17 +9,21 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(control_msgs REQUIRED)
 find_package(phidgets_api REQUIRED)
 find_package(phidgets_drivers REQUIRED)
 find_package(phidgets_msgs REQUIRED)
+find_package(rclcpp_action REQUIRED)
 find_package(rclcpp_components REQUIRED)
 
 set(dependencies
   rclcpp
   std_msgs
+  control_msgs
   phidgets_api
   phidgets_drivers
   phidgets_msgs
+  rclcpp_action
   rclcpp_components
 )
 
@@ -38,6 +42,27 @@ target_include_directories(shunk_phidget_driver_node PUBLIC
 target_link_libraries(shunk_phidget_driver_node phidget_container)
 ament_target_dependencies(shunk_phidget_driver_node ${dependencies})
 
+# Gripper action server
+add_library(gripper_action_server SHARED src/schunck_action_server_node.cpp)
+target_include_directories(gripper_action_server PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+ament_target_dependencies(gripper_action_server ${dependencies})
+
+rclcpp_components_register_node(gripper_action_server
+  PLUGIN "schunk_egp40::GripperActionServer"
+  EXECUTABLE gripper_action_server_node
+)
+
+# Gripper test client
+add_executable(gripper_action_client_node src/test_schunk_action_client.cpp)
+target_include_directories(gripper_action_client_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+ament_target_dependencies(gripper_action_client_node ${dependencies})
+
 install(
   DIRECTORY include/
   DESTINATION include
@@ -55,8 +80,14 @@ install(
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
+install(TARGETS gripper_action_server
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
 # Install executable
-install(TARGETS shunk_phidget_driver_node
+install(TARGETS shunk_phidget_driver_node gripper_action_client_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
