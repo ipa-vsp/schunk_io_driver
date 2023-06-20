@@ -39,9 +39,9 @@ namespace schunk_egp40
 
     rclcpp_action::GoalResponse GripperActionServer::handle_goal(
         const rclcpp_action::GoalUUID & uuid,
-        std::shared_ptr<const control_msgs::action::GripperCommand::Goal> goal)
+        std::shared_ptr<const GripperCommand::Goal> goal)
     {
-        RCLCPP_INFO(this->get_logger(), "Received goal request with position: %f", goal->command.position);
+        RCLCPP_INFO(this->get_logger(), "Received goal the gripper to open (true) close (false): %s", goal->is_open ? "true" : "false");
         (void)uuid;
         return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
     }
@@ -64,9 +64,10 @@ namespace schunk_egp40
     void GripperActionServer::execute(const std::shared_ptr<GoalHandleGripperCommand> goal_handle)
     {
         const auto goal = goal_handle->get_goal();
-        const auto target = goal->command.position;
+        const auto target = goal->is_open;
 
-        auto result = std::make_shared<control_msgs::action::GripperCommand::Result>();
+        auto result = std::make_shared<schunk_command_interface::action::Egp40Command::Result>();
+        auto feedback = std::make_shared<schunk_command_interface::action::Egp40Command::Feedback>();
 
         phidget_request_close_->state = false;
         phidget_request_open_->state = false;
@@ -82,21 +83,27 @@ namespace schunk_egp40
         
         rclcpp::sleep_for(std::chrono::milliseconds(15));
 
-        if(target == 0.0)
+        if(!target)
         {
             phidget_request_close_->state = true;
             digital_output_client_->async_send_request(phidget_request_close_, response_received_callback);
-            result->position = 0.0;
-            result->reached_goal = true;
+            feedback->operation_state = "Closing gripper";
+            goal_handle->publish_feedback(feedback);
+            rclcpp::sleep_for(std::chrono::milliseconds(500));
+            result->success = true;
             goal_handle->succeed(result);
+            RCLCPP_INFO(this->get_logger(), "Closing gripper succeeded");
         }
-        else if (target == 1.0)
+        else if (target)
         {
             phidget_request_open_->state = true;
             digital_output_client_->async_send_request(phidget_request_open_, response_received_callback);
-            result->position = 1.0;
-            result->reached_goal = true;
+            feedback->operation_state = "Opening gripper";
+            goal_handle->publish_feedback(feedback);
+            rclcpp::sleep_for(std::chrono::milliseconds(500));
+            result->success = true;
             goal_handle->succeed(result);
+            RCLCPP_INFO(this->get_logger(), "Opening gripper succeeded");
         }
     }
 }

@@ -10,6 +10,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(control_msgs REQUIRED)
+find_package(schunk_command_interface REQUIRED)
 find_package(phidgets_api REQUIRED)
 find_package(phidgets_drivers REQUIRED)
 find_package(phidgets_msgs REQUIRED)
@@ -20,6 +21,7 @@ set(dependencies
   rclcpp
   std_msgs
   control_msgs
+  schunk_command_interface
   phidgets_api
   phidgets_drivers
   phidgets_msgs

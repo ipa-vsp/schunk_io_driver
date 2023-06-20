@@ -1,0 +1,9 @@
+# Request
+bool is_open # True for Open gripper and False for Close gripper
+---
+# Result
+bool success # True if gripper is opened/closed successfully
+---
+# Feedback
+string operation_state # Feedback message
+
