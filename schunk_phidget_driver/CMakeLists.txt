@@ -57,6 +57,19 @@ rclcpp_components_register_node(gripper_action_server
   EXECUTABLE gripper_action_server_node
 )
 
+# Gripper action with Gripper Command Inteface from control_msgs
+add_library(gripper_action_server_command SHARED src/schunck_action_server_node_command.cpp)
+target_include_directories(gripper_action_server_command PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+ament_target_dependencies(gripper_action_server_command ${dependencies})
+
+rclcpp_components_register_node(gripper_action_server_command
+  PLUGIN "schunk_egp40::GripperActionServer"
+  EXECUTABLE gripper_action_server_command_node
+)
+
 # Gripper test client
 add_executable(gripper_action_client_node src/test_schunk_action_client.cpp)
 target_include_directories(gripper_action_client_node PUBLIC
@@ -64,6 +77,13 @@ target_include_directories(gripper_action_client_node PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 ament_target_dependencies(gripper_action_client_node ${dependencies})
+
+add_executable(gripper_action_client_command_node src/test_schunk_action_client_command.cpp)
+target_include_directories(gripper_action_client_command_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+ament_target_dependencies(gripper_action_client_command_node ${dependencies})
 
 install(
   DIRECTORY include/
@@ -82,14 +102,14 @@ install(
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
-install(TARGETS gripper_action_server
+install(TARGETS gripper_action_server gripper_action_server_command
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
 
 # Install executable
-install(TARGETS phidgets_container_node gripper_action_client_node
+install(TARGETS phidgets_container_node gripper_action_client_node gripper_action_client_command_node
   DESTINATION lib/${PROJECT_NAME}
 )
 

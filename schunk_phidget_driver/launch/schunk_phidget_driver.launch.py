@@ -46,7 +46,7 @@ def generate_launch_description():
 
     device_action_server_node = launch_ros.actions.Node(
         package="schunk_phidget_driver",
-        executable="gripper_action_server_node",
+        executable="gripper_action_server_command_node",
         output="screen",
         parameters=[{"gripper_close_io": 1}, {"gripper_open_io": 2}],
     )
