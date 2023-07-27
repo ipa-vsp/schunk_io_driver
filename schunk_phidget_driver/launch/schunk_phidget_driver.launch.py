@@ -37,7 +37,7 @@ def generate_launch_description():
         namespace="",
         package="schunk_phidget_driver",
         output="screen",
-        executable="shunk_phidget_driver_node",
+        executable="phidgets_container_node",
         parameters=[
             {"package": LaunchConfiguration("phidget_driver_package")},
             {"driver": LaunchConfiguration("phidget_driver_executable")},

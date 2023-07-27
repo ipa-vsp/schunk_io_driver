@@ -50,7 +50,6 @@ class GripperActionClient : public rclcpp::Node
             send_goal_options.result_callback = std::bind(&GripperActionClient::result_callback, this, std::placeholders::_1);
 
             auto future_handle = this->client_ptr_->async_send_goal(goal_msg, send_goal_options);
-
             // Wait for the result
             // while(rclcpp::ok())
             // {

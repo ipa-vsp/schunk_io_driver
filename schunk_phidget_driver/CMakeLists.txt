@@ -36,13 +36,13 @@ target_include_directories(phidget_container PUBLIC
 )
 ament_target_dependencies(phidget_container ${dependencies})
 
-add_executable(shunk_phidget_driver_node src/schunk_phidget_driver_node.cpp)
-target_include_directories(shunk_phidget_driver_node PUBLIC
+add_executable(phidgets_container_node src/phidgets_container_node.cpp)
+target_include_directories(phidgets_container_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(shunk_phidget_driver_node phidget_container)
-ament_target_dependencies(shunk_phidget_driver_node ${dependencies})
+target_link_libraries(phidgets_container_node phidget_container)
+ament_target_dependencies(phidgets_container_node ${dependencies})
 
 # Gripper action server
 add_library(gripper_action_server SHARED src/schunck_action_server_node.cpp)
@@ -89,7 +89,7 @@ install(TARGETS gripper_action_server
 )
 
 # Install executable
-install(TARGETS shunk_phidget_driver_node gripper_action_client_node
+install(TARGETS phidgets_container_node gripper_action_client_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
