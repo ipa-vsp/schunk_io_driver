@@ -91,7 +91,7 @@ install(
 )
 # install launch file
 install(DIRECTORY
-  launch 
+  launch
   DESTINATION share/${PROJECT_NAME}
 )
 # install libraries

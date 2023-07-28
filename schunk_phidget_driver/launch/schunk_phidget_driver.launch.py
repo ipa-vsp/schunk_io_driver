@@ -31,7 +31,7 @@ def generate_launch_description():
     )
 
     ld = launch.LaunchDescription()
-    
+
     # device_container_node = launch_ros.actions.LifecycleNode(
     #     name="schunk_phidget_driver_node",
     #     namespace="",
