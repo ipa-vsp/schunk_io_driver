@@ -23,6 +23,9 @@ class GripperActionClient : public rclcpp::Node
         {
             using namespace std::placeholders;
 
+            // auto client_cbg = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+            // auto timer_cbg = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+
             this->client_ptr_ = rclcpp_action::create_client<GripperCommand>(this, "/gripper_command");
 
             this->timer_ = this->create_wall_timer(
@@ -33,7 +36,7 @@ class GripperActionClient : public rclcpp::Node
         void send_goal()
         {
             this->timer_->cancel();
-
+            RCLCPP_INFO(this->get_logger(), "Starting sending goal");
             if(!this->client_ptr_->wait_for_action_server(std::chrono::seconds(5)))
             {
                 RCLCPP_ERROR(this->get_logger(), "Action server not available after waiting");
@@ -50,9 +53,10 @@ class GripperActionClient : public rclcpp::Node
             send_goal_options.result_callback = std::bind(&GripperActionClient::result_callback, this, std::placeholders::_1);
 
             auto future_handle = this->client_ptr_->async_send_goal(goal_msg, send_goal_options);
-            future_handle.wait();
-            // Put it in seperate callback group
-            rclcpp::sleep_for(std::chrono::seconds(5));
+            std::thread([&]() {
+                auto res = future_handle.get();
+                RCLCPP_INFO(this->get_logger(), "Result status: %d", res->get_status());
+            }).detach();
 
         }
     

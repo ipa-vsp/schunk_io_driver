@@ -18,17 +18,17 @@ namespace schunk_egp40
             std::bind(&GripperActionServer::handle_cancel, this, std::placeholders::_1),
             std::bind(&GripperActionServer::handle_accepted, this, std::placeholders::_1));
 
-        digital_output_client_ = this->create_client<phidgets_msgs::srv::SetDigitalOutput>("set_digital_output");
+        // digital_output_client_ = this->create_client<phidgets_msgs::srv::SetDigitalOutput>("set_digital_output");
 
-        while (!digital_output_client_->wait_for_service(std::chrono::seconds(1)))
-        {
-            if (!rclcpp::ok())
-            {
-                RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
-                rclcpp::shutdown();
-            }
-            RCLCPP_INFO(this->get_logger(), "set_digital_output service not available, waiting again...");
-        }
+        // while (!digital_output_client_->wait_for_service(std::chrono::seconds(1)))
+        // {
+        //     if (!rclcpp::ok())
+        //     {
+        //         RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
+        //         rclcpp::shutdown();
+        //     }
+        //     RCLCPP_INFO(this->get_logger(), "set_digital_output service not available, waiting again...");
+        // }
 
         phidget_request_close_ = std::make_shared<phidgets_msgs::srv::SetDigitalOutput::Request>();
         phidget_request_close_->index = this->get_parameter("gripper_close_io").as_int();
@@ -79,27 +79,29 @@ namespace schunk_egp40
             RCLCPP_DEBUG(this->get_logger(), "Result of set_digital_output: %d", result->success);
         };
 
-        digital_output_client_->async_send_request(phidget_request_close_, response_received_callback);
-        digital_output_client_->async_send_request(phidget_request_open_, response_received_callback);
+        // digital_output_client_->async_send_request(phidget_request_close_, response_received_callback);
+        // digital_output_client_->async_send_request(phidget_request_open_, response_received_callback);
         
         rclcpp::sleep_for(std::chrono::milliseconds(15));
 
         if(target == 0)
         {
             phidget_request_close_->state = true;
-            digital_output_client_->async_send_request(phidget_request_close_, response_received_callback);
+            // digital_output_client_->async_send_request(phidget_request_close_, response_received_callback);
             // Todo: Add feedback
             rclcpp::sleep_for(std::chrono::milliseconds(500));
             result->position = 0.0;
+            result->reached_goal = true;
             goal_handle->succeed(result);
             RCLCPP_INFO(this->get_logger(), "Closing gripper succeeded");
         }
         else if (target > 0)
         {
             phidget_request_open_->state = true;
-            digital_output_client_->async_send_request(phidget_request_open_, response_received_callback);
+            // digital_output_client_->async_send_request(phidget_request_open_, response_received_callback);
             rclcpp::sleep_for(std::chrono::milliseconds(500));
             result->position = 1;
+            result->reached_goal = true;
             goal_handle->succeed(result);
             RCLCPP_INFO(this->get_logger(), "Opening gripper succeeded");
         }

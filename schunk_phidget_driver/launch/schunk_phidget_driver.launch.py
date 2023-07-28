@@ -32,17 +32,17 @@ def generate_launch_description():
 
     ld = launch.LaunchDescription()
     
-    device_container_node = launch_ros.actions.LifecycleNode(
-        name="schunk_phidget_driver_node",
-        namespace="",
-        package="schunk_phidget_driver",
-        output="screen",
-        executable="phidgets_container_node",
-        parameters=[
-            {"package": LaunchConfiguration("phidget_driver_package")},
-            {"driver": LaunchConfiguration("phidget_driver_executable")},
-        ],
-    )
+    # device_container_node = launch_ros.actions.LifecycleNode(
+    #     name="schunk_phidget_driver_node",
+    #     namespace="",
+    #     package="schunk_phidget_driver",
+    #     output="screen",
+    #     executable="phidgets_container_node",
+    #     parameters=[
+    #         {"package": LaunchConfiguration("phidget_driver_package")},
+    #         {"driver": LaunchConfiguration("phidget_driver_executable")},
+    #     ],
+    # )
 
     device_action_server_node = launch_ros.actions.Node(
         package="schunk_phidget_driver",
@@ -53,7 +53,7 @@ def generate_launch_description():
 
     ld.add_action(phidget_driver_package)
     ld.add_action(phidget_driver_executable)
-    ld.add_action(device_container_node)
+    # ld.add_action(device_container_node)
     ld.add_action(device_action_server_node)
 
     return ld
