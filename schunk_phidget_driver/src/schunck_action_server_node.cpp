@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-
 #include "schunk_phidget_driver/schunck_action_server.hpp"
 
 namespace schunk_egp40
