@@ -75,7 +75,7 @@ repos:
         description: Check if copyright notice is available in all files.
         stages: [commit]
         entry: ament_copyright
-        args: ["--add-missing", "Vishnuprasad Prachandabhanu", "apache2"]
+        args: ["--add-missing", "Vishnuprasad Prachandabhanu", "mit"]
         language: system
 
   # Docs - RestructuredText hooks
