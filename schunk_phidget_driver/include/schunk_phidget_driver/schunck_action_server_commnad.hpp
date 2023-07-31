@@ -28,6 +28,7 @@ class GripperActionServer : public rclcpp::Node
     rclcpp::Client<phidgets_msgs::srv::SetDigitalOutput>::SharedPtr digital_output_client_;
     std::shared_ptr<phidgets_msgs::srv::SetDigitalOutput::Request> phidget_request_close_;
     std::shared_ptr<phidgets_msgs::srv::SetDigitalOutput::Request> phidget_request_open_;
+    rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr _pub_joints;
 
     rclcpp_action::GoalResponse handle_goal(const rclcpp_action::GoalUUID &uuid,
                                             std::shared_ptr<const GripperCommand::Goal> goal);

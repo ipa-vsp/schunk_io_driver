@@ -16,22 +16,24 @@ GripperActionServer::GripperActionServer(const rclcpp::NodeOptions &options)
         std::bind(&GripperActionServer::handle_cancel, this, std::placeholders::_1),
         std::bind(&GripperActionServer::handle_accepted, this, std::placeholders::_1));
 
-    // digital_output_client_ = this->create_client<phidgets_msgs::srv::SetDigitalOutput>("set_digital_output");
+    digital_output_client_ = this->create_client<phidgets_msgs::srv::SetDigitalOutput>("set_digital_output");
 
-    // while (!digital_output_client_->wait_for_service(std::chrono::seconds(1)))
-    // {
-    //     if (!rclcpp::ok())
-    //     {
-    //         RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
-    //         rclcpp::shutdown();
-    //     }
-    //     RCLCPP_INFO(this->get_logger(), "set_digital_output service not available, waiting again...");
-    // }
+    while (!digital_output_client_->wait_for_service(std::chrono::seconds(1)))
+    {
+        if (!rclcpp::ok())
+        {
+            RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
+            rclcpp::shutdown();
+        }
+        RCLCPP_INFO(this->get_logger(), "set_digital_output service not available, waiting again...");
+    }
 
     phidget_request_close_ = std::make_shared<phidgets_msgs::srv::SetDigitalOutput::Request>();
     phidget_request_close_->index = this->get_parameter("gripper_close_io").as_int();
     phidget_request_open_ = std::make_shared<phidgets_msgs::srv::SetDigitalOutput::Request>();
     phidget_request_open_->index = this->get_parameter("gripper_open_io").as_int();
+
+    this->_pub_joints = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
 }
 
 rclcpp_action::GoalResponse GripperActionServer::handle_goal(const rclcpp_action::GoalUUID &uuid,
@@ -74,32 +76,45 @@ void GripperActionServer::execute(const std::shared_ptr<GoalHandleGripperCommand
         RCLCPP_DEBUG(this->get_logger(), "Result of set_digital_output: %d", result->success);
     };
 
-    // digital_output_client_->async_send_request(phidget_request_close_, response_received_callback);
-    // digital_output_client_->async_send_request(phidget_request_open_, response_received_callback);
+    digital_output_client_->async_send_request(phidget_request_close_, response_received_callback);
+    digital_output_client_->async_send_request(phidget_request_open_, response_received_callback);
+
+    // Joint States
+    sensor_msgs::msg::JointState jstates;
+    jstates.name.push_back("schunk_egp40_finger_left_joint");
+    jstates.name.push_back("schunk_egp40_finger_right_joint");
 
     rclcpp::sleep_for(std::chrono::milliseconds(15));
 
     if (target == 0)
     {
         phidget_request_close_->state = true;
-        // digital_output_client_->async_send_request(phidget_request_close_, response_received_callback);
+        digital_output_client_->async_send_request(phidget_request_close_, response_received_callback);
         // Todo: Add feedback
         rclcpp::sleep_for(std::chrono::milliseconds(500));
         result->position = 0.0;
         result->reached_goal = true;
         goal_handle->succeed(result);
         RCLCPP_INFO(this->get_logger(), "Closing gripper succeeded");
+
+        jstates.position.push_back(-0.003);
+        jstates.position.push_back(0.003);
     }
     else if (target > 0)
     {
         phidget_request_open_->state = true;
-        // digital_output_client_->async_send_request(phidget_request_open_, response_received_callback);
+        digital_output_client_->async_send_request(phidget_request_open_, response_received_callback);
         rclcpp::sleep_for(std::chrono::milliseconds(500));
         result->position = 1;
         result->reached_goal = true;
         goal_handle->succeed(result);
         RCLCPP_INFO(this->get_logger(), "Opening gripper succeeded");
+
+        jstates.position.push_back(0.003);
+        jstates.position.push_back(-0.003);
     }
+
+    _pub_joints->publish(jstates);
 }
 } // namespace schunk_egp40
 

@@ -55,13 +55,18 @@ class GripperActionClient : public rclcpp::Node
             std::bind(&GripperActionClient::result_callback, this, std::placeholders::_1);
 
         auto future_handle = this->client_ptr_->async_send_goal(goal_msg, send_goal_options);
+
+        // std::future<std::shared_ptr<GoalHandleGripperCommand>> result_fut = std::async(std::launch::async, [&](){
+        //     auto res = future_handle.get();
+        //     RCLCPP_INFO(this->get_logger(), "Result status: %d", res->get_status());
+        //     return res;
+        // });
         std::thread(
-            [&]()
-            {
-                auto res = future_handle.get();
-                RCLCPP_INFO(this->get_logger(), "Result status: %d", res->get_status());
-            })
-            .detach();
+        [&]()
+        {
+            auto res = future_handle.get();
+            RCLCPP_INFO(this->get_logger(), "Result status: %d", res->get_status());
+        }).detach();
     }
 
   private:
