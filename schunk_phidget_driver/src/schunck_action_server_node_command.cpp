@@ -59,7 +59,7 @@ GripperActionServer::GripperActionServer(const rclcpp::NodeOptions &options)
 rclcpp_action::GoalResponse GripperActionServer::handle_goal(const rclcpp_action::GoalUUID &uuid,
                                                              std::shared_ptr<const GripperCommand::Goal> goal)
 {
-    RCLCPP_INFO(this->get_logger(), "Received goal the gripper to open positin: %f", goal->command.position);
+    RCLCPP_INFO(this->get_logger(), "Received goal to the gripper to move positin: %f", goal->command.position);
     (void)uuid;
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
 }
@@ -67,14 +67,14 @@ rclcpp_action::GoalResponse GripperActionServer::handle_goal(const rclcpp_action
 rclcpp_action::CancelResponse
 GripperActionServer::handle_cancel(const std::shared_ptr<GoalHandleGripperCommand> goal_handle)
 {
-    RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
+    RCLCPP_INFO(this->get_logger(), "Received gripper request to cancel goal");
     (void)goal_handle;
     return rclcpp_action::CancelResponse::ACCEPT;
 }
 
 void GripperActionServer::handle_accepted(const std::shared_ptr<GoalHandleGripperCommand> goal_handle)
 {
-    RCLCPP_INFO(this->get_logger(), "Goal accepted");
+    RCLCPP_INFO(this->get_logger(), "Gripper goal accepted");
     std::thread{std::bind(&GripperActionServer::execute, this, std::placeholders::_1), goal_handle}.detach();
 }
 
