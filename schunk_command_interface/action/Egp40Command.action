@@ -6,4 +6,3 @@ bool success # True if gripper is opened/closed successfully
 ---
 # Feedback
 string operation_state # Feedback message
-

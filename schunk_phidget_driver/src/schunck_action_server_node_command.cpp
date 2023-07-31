@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "schunk_phidget_driver/schunck_action_server.hpp"
+#include "schunk_phidget_driver/schunck_action_server_commnad.hpp"
 
 namespace schunk_egp40
 {
@@ -52,13 +52,14 @@ GripperActionServer::GripperActionServer(const rclcpp::NodeOptions &options)
     phidget_request_close_->index = this->get_parameter("gripper_close_io").as_int();
     phidget_request_open_ = std::make_shared<phidgets_msgs::srv::SetDigitalOutput::Request>();
     phidget_request_open_->index = this->get_parameter("gripper_open_io").as_int();
+
+    this->_pub_joints = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
 }
 
 rclcpp_action::GoalResponse GripperActionServer::handle_goal(const rclcpp_action::GoalUUID &uuid,
                                                              std::shared_ptr<const GripperCommand::Goal> goal)
 {
-    RCLCPP_INFO(this->get_logger(), "Received goal the gripper to open (true) close (false): %s",
-                goal->is_open ? "true" : "false");
+    RCLCPP_INFO(this->get_logger(), "Received goal the gripper to open positin: %f", goal->command.position);
     (void)uuid;
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
 }
@@ -80,16 +81,17 @@ void GripperActionServer::handle_accepted(const std::shared_ptr<GoalHandleGrippe
 void GripperActionServer::execute(const std::shared_ptr<GoalHandleGripperCommand> goal_handle)
 {
     const auto goal = goal_handle->get_goal();
-    const auto target = goal->is_open;
+    const auto target = goal->command.position;
 
-    auto result = std::make_shared<schunk_command_interface::action::Egp40Command::Result>();
-    auto feedback = std::make_shared<schunk_command_interface::action::Egp40Command::Feedback>();
+    auto result = std::make_shared<control_msgs::action::GripperCommand::Result>();
+    auto feedback = std::make_shared<control_msgs::action::GripperCommand::Feedback>();
 
     phidget_request_close_->state = false;
     phidget_request_open_->state = false;
 
     auto response_received_callback = [this](ServiceResponseFuture future)
     {
+        future.wait();
         auto result = future.get();
         RCLCPP_DEBUG(this->get_logger(), "Result of set_digital_output: %d", result->success);
     };
@@ -97,30 +99,42 @@ void GripperActionServer::execute(const std::shared_ptr<GoalHandleGripperCommand
     digital_output_client_->async_send_request(phidget_request_close_, response_received_callback);
     digital_output_client_->async_send_request(phidget_request_open_, response_received_callback);
 
+    // Joint States
+    sensor_msgs::msg::JointState jstates;
+    jstates.name.push_back("schunk_egp40_finger_left_joint");
+    jstates.name.push_back("schunk_egp40_finger_right_joint");
+
     rclcpp::sleep_for(std::chrono::milliseconds(15));
 
-    if (!target)
+    if (target == 0)
     {
         phidget_request_close_->state = true;
         digital_output_client_->async_send_request(phidget_request_close_, response_received_callback);
-        feedback->operation_state = "Closing gripper";
-        goal_handle->publish_feedback(feedback);
+        // Todo: Add feedback
         rclcpp::sleep_for(std::chrono::milliseconds(500));
-        result->success = true;
+        result->position = 0.0;
+        result->reached_goal = true;
         goal_handle->succeed(result);
         RCLCPP_INFO(this->get_logger(), "Closing gripper succeeded");
+
+        jstates.position.push_back(-0.003);
+        jstates.position.push_back(0.003);
     }
-    else if (target)
+    else if (target > 0)
     {
         phidget_request_open_->state = true;
         digital_output_client_->async_send_request(phidget_request_open_, response_received_callback);
-        feedback->operation_state = "Opening gripper";
-        goal_handle->publish_feedback(feedback);
         rclcpp::sleep_for(std::chrono::milliseconds(500));
-        result->success = true;
+        result->position = 1;
+        result->reached_goal = true;
         goal_handle->succeed(result);
         RCLCPP_INFO(this->get_logger(), "Opening gripper succeeded");
+
+        jstates.position.push_back(0.003);
+        jstates.position.push_back(-0.003);
     }
+
+    _pub_joints->publish(jstates);
 }
 } // namespace schunk_egp40
 

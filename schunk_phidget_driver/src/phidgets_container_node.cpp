@@ -18,22 +18,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PHIDGETS_CONTAINER_ERROR_HPP_
-#define PHIDGETS_CONTAINER_ERROR_HPP_
+#include "schunk_phidget_driver/phidgets_container.hpp"
 
-#include <cstring>
-#include <stdexcept>
-#include <string>
-
-class PhidgetsContainerException : public std::exception
+int main(int argc, char **argv)
 {
-  private:
-    std::string what_;
-
-  public:
-    explicit PhidgetsContainerException(const std::string &what) : what_("[Phidgets Container Exception] " + what) { }
-
-    const char *what() const noexcept override { return what_.c_str(); }
-};
-
-#endif /* PHIDGETS_CONTAINER_ERROR_HPP_ */
+    rclcpp::init(argc, argv);
+    auto exec = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
+    auto container = std::make_shared<PhidgetsContainer>(exec);
+    std::thread contInit([&container]() { container->init(); });
+    exec->add_node(container);
+    exec->spin();
+    contInit.join();
+    rclcpp::shutdown();
+    return 0;
+}
