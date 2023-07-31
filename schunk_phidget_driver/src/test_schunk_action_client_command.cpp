@@ -62,11 +62,12 @@ class GripperActionClient : public rclcpp::Node
         //     return res;
         // });
         std::thread(
-        [&]()
-        {
-            auto res = future_handle.get();
-            RCLCPP_INFO(this->get_logger(), "Result status: %d", res->get_status());
-        }).detach();
+            [&]()
+            {
+                auto res = future_handle.get();
+                RCLCPP_INFO(this->get_logger(), "Result status: %d", res->get_status());
+            })
+            .detach();
     }
 
   private:
