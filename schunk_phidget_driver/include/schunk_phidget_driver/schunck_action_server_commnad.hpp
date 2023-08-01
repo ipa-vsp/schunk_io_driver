@@ -21,6 +21,14 @@
 #ifndef SCHUNK_ACTION_SERVER_COMMAND_HPP_
 #define SCHUNK_ACTION_SERVER_COMMAND_HPP_
 
+#include <chrono>
+#include <functional>
+#include <iostream>
+#include <mutex>
+#include <string>
+#include <thread>
+#include <vector>
+
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
@@ -50,6 +58,11 @@ class GripperActionServer : public rclcpp::Node
     std::shared_ptr<phidgets_msgs::srv::SetDigitalOutput::Request> phidget_request_open_;
     rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr _pub_joints;
 
+    std::shared_ptr<sensor_msgs::msg::JointState> jstates_;
+    std::mutex lock_msgs_;
+
+    rclcpp::TimerBase::SharedPtr pub_timer;
+
     rclcpp_action::GoalResponse handle_goal(const rclcpp_action::GoalUUID &uuid,
                                             std::shared_ptr<const GripperCommand::Goal> goal);
 
@@ -58,6 +71,8 @@ class GripperActionServer : public rclcpp::Node
     void handle_accepted(const std::shared_ptr<GoalHandleGripperCommand> goal_handle);
 
     void execute(const std::shared_ptr<GoalHandleGripperCommand> goal_handle);
+
+    void run_publisher();
 };
 } // namespace schunk_egp40
 
