@@ -69,7 +69,8 @@ GripperActionServer::GripperActionServer(const rclcpp::NodeOptions &options)
     jstates_->position.push_back(0.003);
     jstates_->position.push_back(-0.003);
 
-    this->pub_timer = this->create_wall_timer(std::chrono::microseconds(500), std::bind(&GripperActionServer::run_publisher, this));
+    this->pub_timer =
+        this->create_wall_timer(std::chrono::microseconds(500), std::bind(&GripperActionServer::run_publisher, this));
 }
 
 rclcpp_action::GoalResponse GripperActionServer::handle_goal(const rclcpp_action::GoalUUID &uuid,
@@ -124,7 +125,7 @@ void GripperActionServer::execute(const std::shared_ptr<GoalHandleGripperCommand
 
     if (target == 0)
     {
-        
+
         phidget_request_close_->state = true;
         digital_output_client_->async_send_request(phidget_request_close_, response_received_callback);
         // Todo: Add feedback
