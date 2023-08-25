@@ -9,8 +9,8 @@
 #include "man2_skill_server_core/skill_action_server_lifecycle_core.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
-#include "sensor_msgs/msg/joint_state.hpp"
 #include "schunk_command_interface/action/gripper_command.hpp"
+#include "sensor_msgs/msg/joint_state.hpp"
 
 #include "phidgets_msgs/srv/set_digital_output.hpp"
 

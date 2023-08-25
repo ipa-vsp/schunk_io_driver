@@ -15,7 +15,6 @@ GripperCommandActionServer::GripperCommandActionServer(const std::string action_
     this->declare_parameter("gripper_open_io", 1);
     this->declare_parameter("gripper_close_io", 2);
 
-
     digital_output_client_ = this->create_client<phidgets_msgs::srv::SetDigitalOutput>("set_digital_output");
 
     while (!digital_output_client_->wait_for_service(std::chrono::seconds(10)) && rclcpp::ok())
@@ -46,8 +45,8 @@ GripperCommandActionServer::GripperCommandActionServer(const std::string action_
     jstates_->position.push_back(0.003);
     jstates_->position.push_back(-0.003);
 
-    this->pub_timer =
-        this->create_wall_timer(std::chrono::microseconds(500), std::bind(&GripperCommandActionServer::run_publisher, this));
+    this->pub_timer = this->create_wall_timer(std::chrono::microseconds(500),
+                                              std::bind(&GripperCommandActionServer::run_publisher, this));
 }
 
 nav2_util::CallbackReturn GripperCommandActionServer::on_configure(const rclcpp_lifecycle::State &state)
@@ -122,7 +121,7 @@ void GripperCommandActionServer::execution()
         jstates_->position.push_back(0.003);
         jstates_->position.push_back(-0.003);
     }
-    else 
+    else
     {
         RCLCPP_ERROR(this->get_logger(), "Gripper position must be between 0 and 1");
         sendFaildResult(result);
