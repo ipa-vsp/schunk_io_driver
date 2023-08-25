@@ -8,7 +8,11 @@
 
 #include "man2_skill_server_core/skill_action_server_lifecycle_core.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "rclcpp_action/rclcpp_action.hpp"
+#include "sensor_msgs/msg/joint_state.hpp"
 #include "schunk_command_interface/action/gripper_command.hpp"
+
+#include "phidgets_msgs/srv/set_digital_output.hpp"
 
 namespace gripper_command_skill
 {
@@ -17,6 +21,7 @@ class GripperCommandActionServer
 {
   public:
     using ActionT = schunk_command_interface::action::GripperCommand;
+    using ServiceResponseFuture = rclcpp::Client<phidgets_msgs::srv::SetDigitalOutput>::SharedFuture;
     explicit GripperCommandActionServer(const std::string action_name,
                                         const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
     ~GripperCommandActionServer() override = default;
@@ -26,9 +31,19 @@ class GripperCommandActionServer
 
     void execution() override;
 
+    void run_publisher();
+
   private:
     std::string action_name_;
     rclcpp::CallbackGroup::SharedPtr callback_group_;
+    rclcpp::Client<phidgets_msgs::srv::SetDigitalOutput>::SharedPtr digital_output_client_;
+    std::shared_ptr<phidgets_msgs::srv::SetDigitalOutput::Request> phidget_request_close_;
+    std::shared_ptr<phidgets_msgs::srv::SetDigitalOutput::Request> phidget_request_open_;
+    rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr _pub_joints;
+
+    std::shared_ptr<sensor_msgs::msg::JointState> jstates_;
+    rclcpp::TimerBase::SharedPtr pub_timer;
+    std::mutex lock_msgs_;
 };
 } // namespace gripper_command_skill
 
