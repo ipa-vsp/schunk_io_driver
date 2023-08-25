@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(schunk_command_interface)
+project(schunk_bt_skills)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -7,14 +7,19 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(control_msgs REQUIRED)
+find_package(schunk_command_interface REQUIRED)
+find_package(phidgets_msgs REQUIRED)
+find_package(man2_skill_server_core REQUIRED)
+find_package(rmw_implementation_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(nav2_util REQUIRED)
 
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "action/Egp40Command.action"
-  "action/GripperCommand.action"
+install(
+  DIRECTORY include/
+  DESTINATION include
 )
 
 if(BUILD_TESTING)
