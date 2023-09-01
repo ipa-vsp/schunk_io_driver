@@ -14,6 +14,7 @@ find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "action/Egp40Command.action"
+  "action/GripperCommand.action"
 )
 
 if(BUILD_TESTING)
