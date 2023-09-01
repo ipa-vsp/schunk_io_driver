@@ -9,7 +9,7 @@
 #include "man2_skill_server_core/skill_action_server_lifecycle_core.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
-#include "schunk_command_interface/action/gripper_command.hpp"
+#include "control_msgs/action/gripper_command.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 
 #include "phidgets_msgs/srv/set_digital_output.hpp"
@@ -17,10 +17,10 @@
 namespace gripper_command_skill
 {
 class GripperCommandActionServer
-    : public ros2_skill_server_core::SkillActionServerLifecycleCore<schunk_command_interface::action::GripperCommand>
+    : public ros2_skill_server_core::SkillActionServerLifecycleCore<control_msgs::action::GripperCommand>
 {
   public:
-    using ActionT = schunk_command_interface::action::GripperCommand;
+    using ActionT = control_msgs::action::GripperCommand;
     using ServiceResponseFuture = rclcpp::Client<phidgets_msgs::srv::SetDigitalOutput>::SharedFuture;
     explicit GripperCommandActionServer(const std::string action_name,
                                         const rclcpp::NodeOptions &options = rclcpp::NodeOptions());

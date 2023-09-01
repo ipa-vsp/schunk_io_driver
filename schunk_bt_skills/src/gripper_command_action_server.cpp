@@ -4,7 +4,7 @@ namespace gripper_command_skill
 {
 GripperCommandActionServer::GripperCommandActionServer(const std::string action_name,
                                                        const rclcpp::NodeOptions &options)
-    : ros2_skill_server_core::SkillActionServerLifecycleCore<schunk_command_interface::action::GripperCommand>(
+    : ros2_skill_server_core::SkillActionServerLifecycleCore<control_msgs::action::GripperCommand>(
           action_name, action_name, options),
       action_name_(action_name)
 {
@@ -71,7 +71,7 @@ void GripperCommandActionServer::execution()
 {
     std::scoped_lock<std::mutex> lock(this->lock_msgs_);
     const auto goal = this->getCurrentGoal();
-    const auto target = goal->position;
+    const auto target = goal->command.position;
     auto result = std::make_shared<ActionT::Result>();
 
     phidget_request_close_->state = false;
