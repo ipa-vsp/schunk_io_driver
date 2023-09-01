@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-
 #include "schunk_bt_skills/gripper_command_action_server.hpp"
 
 namespace gripper_command_skill
